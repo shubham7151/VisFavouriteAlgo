@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        #maxFlowDisplay {
+            font-size: 20px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .circleGreen {
+        width: 50px; /* Set the width of the circle */
+        height: 50px; /* Set the height of the circle */
+        background-color: RGB(0,255,0); /* Set the background color */
+        border-radius: 50%; /* Make it a circle */
+        align-items: center;
+    }
+    .circleRed {
+        width: 50px; /* Set the width of the circle */
+        height: 50px; /* Set the height of the circle */
+        background-color: RGB(255,0,0); /* Set the background color */
+        border-radius: 50%; /* Make it a circle */
+        align-items: center;
+    }
+
+    </style>
+</head>
+<body>
+<div>
+    <button onclick="startAlgorithm()">Start Algorithm</button>
+    <div>
+        <div class="circleGreen"></div>Source
+        <div class="circleRed"></div>Sink
+    </div>
+    <div id="maxFlowDisplay">Max Flow: 0</div>
+    
+    
+</div>
+<script>
+// Graph representation
+let nodes = []; // List of vertices
+let edges = []; // List of edges
+let capacities = []; // Capacity matrix
+let flows = []; // Flow matrix
+let source = -1; // Source vertex index
+let sink = -1; // Sink vertex index
+let maxFlow = 0; // Maximum flow value
+let iterationSteps = []; // Steps for algorithm visualization
+let stepIndex = 0; // Current step index
+let isDragging = false; // Flag to indicate if dragging is occurring
+let startNodeIndex = -1; // Starting node index for dragging
+
+function setup() {
+    createCanvas(1750, 700); // Set up canvas size
+    noLoop(); // Disable continuous drawing
+}
+
+function draw() {
+    background(255); // Clear canvas
+    drawGraph(); // Draw the graph
+    drawBoundary()
+}
+function drawBoundary() {
+    noFill();
+    stroke(0);
+    rect(0, 0, width - 1, height - 1); // Draw rectangle around canvas boundary
+}
+
+function mousePressed() {
+    if (mouseButton === RIGHT) {
+        addVertex(mouseX, mouseY); // Add vertex on right-click
+    } else if (mouseButton === LEFT) {
+        let nodeIndex = getNodeIndexAtPosition(mouseX, mouseY);
+        if (nodeIndex !== -1) {
+            isDragging = true; // Start dragging if left-clicked on a vertex
+            startNodeIndex = nodeIndex;
+        }
+    }
+}
+
+function mouseReleased() {
+    if (isDragging && mouseButton === LEFT) {
+        let endNodeIndex = getNodeIndexAtPosition(mouseX, mouseY);
+        if (startNodeIndex !== -1 && endNodeIndex !== -1 && startNodeIndex !== endNodeIndex) {
+            let capacity = prompt("Enter capacity for the edge:", "10");
+            if (capacity !== null) {
+                addEdge(startNodeIndex, endNodeIndex, parseInt(capacity)); // Add edge with capacity
+            }
+        }
+        isDragging = false; // End dragging
+        startNodeIndex = -1;
+    }
+}
+
+function doubleClicked() {
+    let nodeIndex = getNodeIndexAtPosition(mouseX, mouseY);
+    if (nodeIndex !== -1) {
+        source = nodeIndex; // Set vertex as source on double-click
+        redraw();
+    }
+}
+
+
+
+function keyPressed() {
+    if (key === 'S') {
+        let nodeIndex = getNodeIndexAtPosition(mouseX, mouseY);
+        if (nodeIndex !== -1) {
+            source = nodeIndex; // Set vertex as sink on 'S' key press
+            redraw();
+        }
+    }else if(key === 'T'){
+        let nodeIndex = getNodeIndexAtPosition(mouseX, mouseY);
+        if (nodeIndex !== -1) {
+            sink = nodeIndex; // Set vertex as source on 'S' key press
+            redraw();
+        }
+    }
+}
+
+function addVertex(x, y) {
+    nodes.push({ x: x, y: y }); // Add vertex at specified coordinates
+    updateCapacitiesMatrix(); // Update capacity matrix
+    redraw();
+}
+
+function addEdge(from, to, capacity) {
+    capacities[from][to] = capacity; // Set capacity for the edge
+    edges.push({ from: from, to: to, capacity: capacity }); // Add edge to list
+    redraw();
+}
+
+function startAlgorithm() {
+    if (source === -1 || sink === -1) {
+        alert("Please set both a source and a sink."); // Ensure source and sink are set
+        return;
+    }
+    maxFlow = 0; // Reset max flow
+    flows = capacities.map(row => row.map(val => 0)); // Reset flow matrix
+    iterationSteps = []; // Clear iteration steps
+    edmondsKarp(source, sink); // Run Edmonds-Karp algorithm
+    stepIndex = 0; // Reset step index
+    iterateSteps(); // Start step-by-step visualization
+}
+
+function iterateSteps() {
+    if (stepIndex < iterationSteps.length) {
+        flows = iterationSteps[stepIndex]; // Update flows to current step
+        stepIndex++;
+        redraw();
+        setTimeout(iterateSteps, 1000); // Delay for next step
+    } else {
+        document.getElementById('maxFlowDisplay').innerText = "Max Flow: " + maxFlow; // Display max flow
+        console.log("Max Flow: " + maxFlow); // Output max flow
+    }
+}
+
+function updateCapacitiesMatrix() {
+    capacities = Array(nodes.length).fill().map(() => Array(nodes.length).fill(0)); // Initialize capacity matrix
+    flows = Array(nodes.length).fill().map(() => Array(nodes.length).fill(0)); // Initialize flow matrix
+    edges.forEach(edge => {
+        capacities[edge.from][edge.to] = edge.capacity; // Set capacities based on edges
+    });
+}
+
+function drawGraph() {
+    noStroke(); // Ensure no stroke is applied to the graph elements
+    // strokeWeight(2);
+    // for (let edge of edges) {
+    //     let fromNode = nodes[edge.from];
+    //     let toNode = nodes[edge.to];
+    //     stroke(0);
+    //     line(fromNode.x, fromNode.y - 4, toNode.x, toNode.y - 4); // Draw edge
+    //     line(fromNode.x, fromNode.y + 4, toNode.x, toNode.y + 4); // Draw edge
+    //     let midX = (fromNode.x + toNode.x) / 2;
+    //     let midY = (fromNode.y + toNode.y) / 2;
+    //     // let textToShow= 
+    //     textSize(16);
+    //     fill(0);
+    //     noStroke();
+    //     textAlign(CENTER, CENTER);
+    //     text(flows[edge.from][edge.to] + "/" + capacities[edge.from][edge.to], midX, midY); // Display flow/capacity
+    // }
+
+    for (let edge of edges) {
+        let fromNode = nodes[edge.from];
+        let toNode = nodes[edge.to];
+        
+        // Calculate direction vector
+        let directionX = toNode.x - fromNode.x;
+        let directionY = toNode.y - fromNode.y;
+        let edgeLength = sqrt(directionX * directionX + directionY * directionY);
+
+        // Calculate unit vector
+        let unitX = directionX / edgeLength;
+        let unitY = directionY / edgeLength;
+
+        // Coordinates for arrowhead
+        let arrowSize = 10; // Size of the arrowhead
+        let arrowX = toNode.x - unitX * arrowSize * 2;
+        let arrowY = toNode.y - unitY * arrowSize * 2;
+
+        // Draw edge line
+        stroke(0, 100, 200); // Blue color for edge
+        strokeWeight(2);
+        line(fromNode.x, fromNode.y, toNode.x, toNode.y);
+
+        // Draw arrowhead
+        push();
+        translate(arrowX, arrowY);
+        rotate(atan2(directionY, directionX));
+        fill(0, 100, 200); // Blue color for arrowhead
+        triangle(-arrowSize, arrowSize / 2, 0, 0, -arrowSize, -arrowSize / 2);
+        pop();
+
+        // Display flow/capacity text
+        let midX = (fromNode.x + toNode.x) / 2;
+        let midY = (fromNode.y + toNode.y) / 2;
+        fill(0);
+        noStroke();
+        textSize(20);
+        textAlign(CENTER, CENTER);
+        text(flows[edge.from][edge.to] + "/" + capacities[edge.from][edge.to], midX+10, midY+10); // Display flow/capacity
+    }
+
+    for (let i = 0; i < nodes.length; i++) {
+        let node = nodes[i];
+        if (i === source) {
+            fill(0, 255, 0); // Green for source
+        } else if (i === sink) {
+            fill(255, 0, 0); // Red for sink
+        } else {
+            fill(255);
+        }
+        stroke(0);
+        ellipse(node.x, node.y, 40, 40); // Draw vertex
+    }
+
+    if (isDragging && startNodeIndex !== -1) {
+        let startNode = nodes[startNodeIndex];
+        stroke(150);
+        // line(startNode.x, startNode.y, mouseX, mouseY); // Draw dragging line
+    }
+}
+
+function getNodeIndexAtPosition(x, y) {
+    for (let i = 0; i < nodes.length; i++) {
+        let node = nodes[i];
+        let d = dist(x, y, node.x, node.y);
+        if (d < 20) {
+            return i; // Return index of vertex at position
+        }
+    }
+    return -1;
+}
+
+function bfs(source, sink, parent) {
+    let visited = new Array(nodes.length).fill(false); // Initialize visited array
+    let queue = [];
+    queue.push(source);
+    visited[source] = true;
+    parent[source] = -1;
+
+    while (queue.length > 0) {
+        let u = queue.shift();
+
+        for (let v = 0; v < nodes.length; v++) {
+            if (!visited[v] && capacities[u][v] - flows[u][v] > 0) {
+                queue.push(v);
+                parent[v] = u;
+                visited[v] = true; // Mark node as visited
+            }
+        }
+    }
+    return visited[sink]; // Return if sink is reached
+}
+
+function edmondsKarp(source, sink) {
+    let parent = new Array(nodes.length);
+
+    while (bfs(source, sink, parent)) {
+        let pathFlow = Infinity;
+        console.log(parent)
+        for (let v = sink; v != source; v = parent[v]) {
+            console.log(parent[v])
+            let u = parent[v];
+            pathFlow = min(pathFlow, capacities[u][v] - flows[u][v]); // Find minimum residual capacity
+        }
+
+        for (let v = sink; v != source; v = parent[v]) {
+            let u = parent[v];
+            flows[u][v] += pathFlow; // Update forward flow
+            flows[v][u] -= pathFlow; // Update backward flow
+        }
+
+        maxFlow += pathFlow; // Add path flow to overall flow
+        iterationSteps.push(JSON.parse(JSON.stringify(flows))); // Record step for visualization
+    }
+}
+</script>
+</body>
+</html>
