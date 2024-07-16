@@ -71,6 +71,7 @@ let iterationSteps = []; // Steps for algorithm visualization
 let stepIndex = 0; // Current step index
 let isDragging = false; // Flag to indicate if dragging is occurring
 let startNodeIndex = -1; // Starting node index for dragging
+let selectedNode = -1; // Currently selected node index
 
 function setup() {
     let canvas = createCanvas(1750, 700); // Set up canvas size
@@ -98,7 +99,12 @@ function mousePressed() {
         if (nodeIndex !== -1) {
             isDragging = true; // Start dragging if left-clicked on a vertex
             startNodeIndex = nodeIndex;
+            selectedNode = nodeIndex;
+        }else {
+            selectedNode = -1;
         }
+        
+        redraw();
     }
 }
 
@@ -113,6 +119,7 @@ function mouseReleased() {
         }
         isDragging = false; // End dragging
         startNodeIndex = -1;
+        redraw();
     }
 }
 
@@ -125,16 +132,16 @@ function doubleClicked() {
 }
 
 function keyPressed() {
-    if (key === 'S') {
+    if (key === 'S' && keyIsDown(SHIFT)) {
         let nodeIndex = getNodeIndexAtPosition(mouseX, mouseY);
         if (nodeIndex !== -1) {
-            source = nodeIndex; // Set vertex as sink on 'S' key press
+            source = nodeIndex; // Set vertex as source on 'Shift + S' key press
             redraw();
         }
-    } else if (key === 'T') {
+    } else if (key === 'T' && keyIsDown(SHIFT)) {
         let nodeIndex = getNodeIndexAtPosition(mouseX, mouseY);
         if (nodeIndex !== -1) {
-            sink = nodeIndex; // Set vertex as source on 'S' key press
+            sink = nodeIndex; // Set vertex as sink on 'Shift + T' key press
             redraw();
         }
     }
@@ -215,7 +222,7 @@ function drawGraph() {
         translate(arrowX, arrowY);
         rotate(atan2(directionY, directionX));
         fill(0, 100, 200); // Blue color for arrowhead
-        triangle(-arrowSize, arrowSize / 2, 0, 0, -arrowSize, -arrowSize / 2);
+        triangle(-arrowSize, -arrowSize / 2, -arrowSize, arrowSize / 2, 0, 0);
         pop();
 
         // Display flow/capacity text
@@ -230,20 +237,28 @@ function drawGraph() {
 
     for (let i = 0; i < nodes.length; i++) {
         let node = nodes[i];
-        if (i === source) {
-            fill(0, 255, 0); // Green for source
-        } else if (i === sink) {
-            fill(255, 0, 0); // Red for sink
+        if (i === selectedNode) {
+            stroke(0); // Default border color
+            strokeWeight(4);
+            fill(255, 255, 0); // Yellow color for selected node
         } else {
-            fill(255);
+            stroke(0);
+            strokeWeight(1);
+            if (i === source) {
+                fill(0, 255, 0); // Green for source
+            } else if (i === sink) {
+                fill(255, 0, 0); // Red for sink
+            } else {
+                fill(255); // White for other nodes
+            }
         }
-        stroke(0);
         ellipse(node.x, node.y, 40, 40); // Draw vertex
     }
 
     if (isDragging && startNodeIndex !== -1) {
         let startNode = nodes[startNodeIndex];
         stroke(150);
+        line(startNode.x, startNode.y, mouseX, mouseY); // Draw line while dragging
     }
 }
 
