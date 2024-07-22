@@ -34,7 +34,7 @@
 <div>
     <div class="container">
         <h1 style="text-align: center;">
-            Edmonds–Karp algorithm
+            Edmonds–Karp Algorithm
         </h1>
         <h3>Instruction</h3>
         <div class="row">
@@ -56,6 +56,7 @@
         
         <button class="btn btn-primary" onclick="startAlgorithm()">Start Algorithm</button>
         <button class="btn btn-primary" onclick="window.location.reload()">Reset</button>
+        <button class="btn btn-primary" onclick="showSteps()">Show Steps</button>
         <div class="form-group">
             <label for="capacityInput">Set Capacity:</label>
             <input type="number" class="form-control" id="capacityInput" placeholder="Enter capacity">
@@ -67,9 +68,7 @@
 </div>
 
 <script>
-document.addEventListener('contextmenu', event => {
-    event.preventDefault();
-});
+document.addEventListener('contextmenu', event => event.preventDefault());
 
 let nodes = [];
 let edges = [];
@@ -84,6 +83,7 @@ let isDragging = false;
 let startNodeIndex = -1;
 let selectedNode = -1;
 let selectedEdge = null;
+let showStepsInterval;
 
 function setup() {
     let canvas = createCanvas(1750, 700);
@@ -103,32 +103,6 @@ function drawBoundary() {
     rect(0, 0, width - 1, height - 1);
 }
 
-// function mousePressed() {
-//     if (mouseButton === RIGHT) {
-//         addVertex(mouseX, mouseY);
-//     } else if (mouseButton === LEFT) {
-//         let nodeIndex = getNodeIndexAtPosition(mouseX, mouseY);
-//         if (nodeIndex !== -1) {
-//             isDragging = true;
-//             startNodeIndex = nodeIndex;
-//             selectedNode = nodeIndex;
-//             selectedEdge = null;
-//             updateSelectedItemDisplay();
-//         } else {
-//             selectedNode = -1;
-//             let edgeIndex = getEdgeIndexAtPosition(mouseX, mouseY);
-//             if (edgeIndex !== -1) {
-//                 selectedEdge = edges[edgeIndex];
-//                 selectedNode = -1; // Deselect node if edge is selected
-//                 updateSelectedItemDisplay();
-//             } else {
-//                 selectedEdge = null;
-//                 updateSelectedItemDisplay();
-//             }
-//         }
-//         redraw();
-//     }
-// }
 function mousePressed() {
     if (mouseButton === RIGHT) {
         addVertex(mouseX, mouseY);
@@ -157,7 +131,6 @@ function mousePressed() {
         }
     }
 }
-
 
 function mouseReleased() {
     if (isDragging && mouseButton === LEFT) {
@@ -228,21 +201,36 @@ function startAlgorithm() {
     maxFlow = 0;
     flows = capacities.map(row => row.map(val => 0));
     iterationSteps = [];
+    console.log("Starting Edmonds-Karp Algorithm...");
     edmondsKarp(source, sink);
-    stepIndex = 0;
-    iterateSteps();
+    document.getElementById('maxFlowDisplay').innerText = "Max Flow: " + maxFlow;
+    console.log("Max Flow: " + maxFlow);
 }
 
-function iterateSteps() {
-    if (stepIndex < iterationSteps.length) {
-        flows = iterationSteps[stepIndex];
-        stepIndex++;
-        redraw();
-        setTimeout(iterateSteps, 1000);
-    } else {
-        document.getElementById('maxFlowDisplay').innerText = "Max Flow: " + maxFlow;
-        console.log("Max Flow: " + maxFlow);
+function showSteps() {
+    if (iterationSteps.length === 0) {
+        console.log("No steps recorded. Please run the algorithm first.");
+        return;
     }
+    stepIndex = 0;
+    clearInterval(showStepsInterval);
+    showStepsInterval = setInterval(() => {
+        if (stepIndex < iterationSteps.length) {
+            flows = iterationSteps[stepIndex].flows;
+            highlightPath(iterationSteps[stepIndex].path);
+            
+            setTimeout(() => {
+                console.log("Step " + (stepIndex + 1) + ": Path - ", iterationSteps[stepIndex].path);
+                stepIndex++;
+                redraw();
+            }, 2000);
+            // console.log("Step " + (stepIndex + 1) + ": Path - ", iterationSteps[stepIndex].path);
+            // stepIndex++;
+            // redraw();
+        } else {
+            clearInterval(showStepsInterval);
+        }
+    }, 4000);
 }
 
 function updateCapacitiesMatrix() {
@@ -292,7 +280,8 @@ function drawGraph() {
         let midY = (fromNode.y + toNode.y) / 2;
         noStroke();
         fill(0);
-        // text(capacities[edge.from][edge.to], midX, midY);
+        textSize(14); // Default text size for non-highlighted edges
+        textStyle(NORMAL)
         text(flows[edge.from][edge.to] + "/" + capacities[edge.from][edge.to], midX + 10, midY + 10); // Display flow/capacity
     }
 
@@ -315,6 +304,42 @@ function drawGraph() {
         let startNode = nodes[startNodeIndex];
         stroke(150);
         line(startNode.x, startNode.y, mouseX, mouseY);
+    }
+}
+
+function highlightPath(path) {
+    for (let i = 0; i < path.length - 1; i++) {
+        let fromNode = nodes[path[i]];
+        let toNode = nodes[path[i + 1]];
+        
+        let directionX = toNode.x - fromNode.x;
+        let directionY = toNode.y - fromNode.y;
+        let edgeLength = sqrt(directionX * directionX + directionY * directionY);
+        let unitX = directionX / edgeLength;
+        let unitY = directionY / edgeLength;
+
+        let arrowSize = 10;
+        let arrowX = toNode.x - unitX * arrowSize * 2;
+        let arrowY = toNode.y - unitY * arrowSize * 2;
+
+        stroke(255, 0, 255); // Highlight path in green
+        strokeWeight(4);
+        line(fromNode.x, fromNode.y, toNode.x, toNode.y);
+
+        push();
+        translate(arrowX, arrowY);
+        rotate(atan2(directionY, directionX));
+        fill(0, 255, 0); // Highlight arrow of path in green
+        triangle(-arrowSize, -arrowSize / 2, -arrowSize, arrowSize / 2, 0, 0);
+        pop();
+
+        let midX = (fromNode.x + toNode.x) / 2;
+        let midY = (fromNode.y + toNode.y) / 2;
+        noStroke();
+        fill(0);
+        textSize(16); // Increase text size
+        textStyle(BOLD); // Bold text
+        text(flows[path[i]][path[i + 1]] + "/" + capacities[path[i]][path[i + 1]], midX + 10, midY + 10);
     }
 }
 
@@ -381,10 +406,14 @@ function edmondsKarp(source, sink) {
 
     while (bfs(source, sink, parent)) {
         let pathFlow = Infinity;
+        let path = [];
         for (let v = sink; v != source; v = parent[v]) {
+            path.push(v);
             let u = parent[v];
             pathFlow = min(pathFlow, capacities[u][v] - flows[u][v]);
         }
+        path.push(source);
+        path.reverse();
 
         for (let v = sink; v != source; v = parent[v]) {
             let u = parent[v];
@@ -393,7 +422,8 @@ function edmondsKarp(source, sink) {
         }
 
         maxFlow += pathFlow;
-        iterationSteps.push(JSON.parse(JSON.stringify(flows)));
+        iterationSteps.push({ flows: JSON.parse(JSON.stringify(flows)), path: path });
+        console.log("Path found: ", path, " with flow: ", pathFlow);
     }
 }
 
