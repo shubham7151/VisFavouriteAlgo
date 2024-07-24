@@ -4,11 +4,75 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
+        /* body{
+            background-color: #31102F;
+        background: radial-gradient(ellipse at center, rgba(49,16,47,1) 0%, rgba(40,11,41,1) 100%);
+        color: aliceblue;
+        } */
+
+
+        html {
+  height:100%;
+}
+
+body {
+  margin:0;
+}
+
+.bg {
+  animation:slide 3s ease-in-out infinite alternate;
+  background-image: linear-gradient(-60deg, #6c3 50%, #09f 50%);
+  bottom:0;
+  left:-50%;
+  opacity:.5;
+  position:fixed;
+  right:-50%;
+  top:0;
+  z-index:-1;
+}
+
+.bg2 {
+  animation-direction:alternate-reverse;
+  animation-duration:4s;
+}
+
+.bg3 {
+  animation-duration:5s;
+}
+
+.content {
+  background-color:rgba(255,255,255,.8);
+  border-radius:.25em;
+  box-shadow:0 0 .25em rgba(0,0,0,.25);
+  box-sizing:border-box;
+  left:50%;
+  padding:10vmin;
+  position:fixed;
+  text-align:center;
+  top:50%;
+  transform:translate(-50%, -50%);
+}
+
+h1 {
+  font-family:monospace;
+}
+
+@keyframes slide {
+  0% {
+    transform:translateX(-25%);
+  }
+  100% {
+    transform:translateX(25%);
+  }
+}
+
+
         #maxFlowDisplay {
             font-size: 20px;
             margin-top: 10px;
             text-align: center;
         }
+        
         #selectedItemDisplay {
             font-size: 20px;
             margin-top: 10px;
@@ -28,15 +92,49 @@
             border-radius: 50%;
             align-items: center;
         }
+        .canvas-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+    canvas {
+        border: 1px solid #000;
+    }
+    
     </style>
 </head>
-<body>
+<body >
+    <div class="bg"></div>
+    <div class="bg bg2"></div>
+    <div class="bg bg3"></div>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./About.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./Theory.html">Theory</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
 <div>
     <div class="container">
-        <h1 style="text-align: center;">
-            Edmonds–Karp Algorithm
-        </h1>
-        <h3>Instruction</h3>
+        <div class="row" style="justify-content: center;">
+            <h1 style="text-align: center;">
+                Edmonds–Karp Algorithm
+            </h1>
+        </div>
+        <div class="row">
+            <h3>Instruction</h3>
+        </div>
         <div class="row">
             <div class="col-sm">
                 <ul>
@@ -57,18 +155,40 @@
                 </div>
             </div>
         </div>
-        
-        <button class="btn btn-primary" onclick="startAlgorithm()">Start Algorithm</button>
-        <button class="btn btn-primary" onclick="window.location.reload()">Reset</button>
-        <button class="btn btn-primary" onclick="showSteps()">Show Steps</button>
-        <div class="form-group">
-            <label for="capacityInput">Set Capacity:</label>
-            <input type="number" class="form-control" id="capacityInput" placeholder="Enter capacity">
-            <button class="btn btn-primary" onclick="setCapacity()">Set Capacity</button>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-4 ">
+                    <button class="btn btn-primary" onclick="startAlgorithm()">Start Algorithm</button>
+                    <button class="btn btn-primary" onclick="window.location.reload()">Reset</button>
+                    <button class="btn btn-primary" onclick="showSteps()">Show Steps</button>
+                </div>
+            </div>
         </div>
+       <br>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-4 ">
+                    <div class="form-group">
+                        <label for="capacityInput">Set Capacity:</label>
+                        <input type="number" class="" id="capacityInput" placeholder="Enter capacity">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-7 ">
+                                    <button class="btn btn-primary" style="align-items: center;" onclick="setCapacity()">Set Capacity</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     </div>
     <div id="maxFlowDisplay">Max Flow: 0</div>
     <div id="selectedItemDisplay">Selected Item: None</div>
+    <div class="canvas-wrapper">
+        <div id="algorithmCanvas"></div>
+    </div>
 </div>
 
 <script>
@@ -90,7 +210,8 @@ let selectedEdge = null;
 let showStepsInterval;
 
 function setup() {
-    let canvas = createCanvas(1750, 700);
+    let canvas = createCanvas(1000, 700);
+    canvas.parent('algorithmCanvas');
     noLoop();
     canvas.elt.addEventListener('contextmenu', event => event.preventDefault());
 }
@@ -227,14 +348,14 @@ function showSteps() {
                 console.log("Step " + (stepIndex + 1) + ": Path - ", iterationSteps[stepIndex].path);
                 stepIndex++;
                 redraw();
-            }, 2000);
+            }, 1000);
             // console.log("Step " + (stepIndex + 1) + ": Path - ", iterationSteps[stepIndex].path);
             // stepIndex++;
             // redraw();
         } else {
             clearInterval(showStepsInterval);
         }
-    }, 4000);
+    }, 2000);
 }
 
 function updateCapacitiesMatrix() {
