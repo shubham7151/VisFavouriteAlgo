@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centered Navbar Items</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-nav {
+            margin: auto;
+        }
+        <style>
+        body {
+            padding-top: 60px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .figure {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .figure img {
+            max-width: 100%;
+            height: auto;
+        }
+        .table-of-contents {
+            margin-top: 20px;
+        }
+        .table-of-contents a {
+            display: block;
+            margin: 5px 0;
+        }
+    </style>
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./About.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./Theory.html">Theory</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <div class="container">
+        <h1 class="text-center">Edmonds-Karp Algorithm</h1>
+    
+        <div class="table-of-contents">
+            <h2>Table of Contents</h2>
+            <a href="#introduction">1. Introduction</a>
+            <a href="#flow-network">2. Flow Network</a>
+            <a href="#residual-graph">3. Residual Graph</a>
+            <a href="#algorithm">4. Edmonds-Karp Algorithm</a>
+            <a href="#applications">5. Applications</a>
+            <a href="#pseudocode">6. Pseudo Code</a>
+        </div>
+    
+        <div id="introduction" class="content">
+            <h2>1. Introduction</h2>
+            <p>The Edmonds-Karp algorithm is an implementation of the Ford-Fulkerson method for computing the maximum flow in a flow network. It uses breadth-first search (BFS) to find augmenting paths. The algorithm runs in <code>O(VE<sup>2</sup>)</code> time, where <i>V</i> is the number of vertices and <i>E</i> is the number of edges in the graph.</p>
+        </div>
+    
+        <div id="flow-network" class="content">
+            <h2>2. Flow Network</h2>
+            <p>A flow network is a directed graph where each edge has a capacity and each edge receives a flow. The amount of flow on an edge cannot exceed the capacity of the edge. The goal is to maximize the total flow from a source vertex (S) to a sink vertex (T).</p>
+            <div class="figure">
+                <img src="flow_network_example.png" alt="Flow Network Example">
+                <figcaption>Figure 1: Flow Network Example</figcaption>
+            </div>
+        </div>
+    
+        <div id="residual-graph" class="content">
+            <h2>3. Residual Graph</h2>
+            <p>The residual graph is used to find augmenting paths in the flow network. For each edge in the original graph, the residual graph contains two edges: one in the same direction with a capacity equal to the remaining capacity of the original edge, and one in the opposite direction with a capacity equal to the flow on the original edge.</p>
+            <div class="figure">
+                <img src="residual_graph_example.png" alt="Residual Graph Example">
+                <figcaption>Figure 2: Residual Graph Example</figcaption>
+            </div>
+        </div>
+    
+        <div id="algorithm" class="content">
+            <h2>4. Edmonds-Karp Algorithm</h2>
+            <p>The Edmonds-Karp algorithm repeatedly finds augmenting paths using BFS and augments flow along these paths until no more augmenting paths can be found. Each BFS finds the shortest augmenting path in terms of the number of edges.</p>
+            <div class="figure">
+                <img src="edmonds_karp_algorithm.png" alt="Edmonds-Karp Algorithm">
+                <figcaption>Figure 3: Edmonds-Karp Algorithm</figcaption>
+            </div>
+        </div>
+    
+        <div id="applications" class="content">
+            <h2>5. Applications</h2>
+            <p>The Edmonds-Karp algorithm is used in various applications, including:</p>
+            <ul>
+                <li>Network flow optimization</li>
+                <li>Matching problems in bipartite graphs</li>
+                <li>Circulation problems</li>
+                <li>Connectivity in networks</li>
+            </ul>
+        </div>
+    
+        <div id="pseudocode" class="content">
+            <h2>6. Pseudo Code</h2>
+            <pre>
+    function BFS(source, sink, parent):
+        Create a queue, Q
+        Mark all nodes as not visited
+        Enqueue source and mark it as visited
+        while Q is not empty:
+            u = Q.dequeue()
+            for each edge (u, v) in residual graph:
+                if v is not visited and capacity of edge (u, v) > 0:
+                    Enqueue v and mark it as visited
+                    parent[v] = u
+                    if v == sink:
+                        return true
+        return false
+    
+    function edmondsKarp(source, sink):
+        Initialize flow in all edges to 0
+        while BFS(source, sink, parent) is true:
+            path_flow = Infinity
+            s = sink
+            while s != source:
+                path_flow = min(path_flow, capacity[parent[s]][s])
+                s = parent[s]
+            v = sink
+            while v != source:
+                u = parent[v]
+                flow[u][v] += path_flow
+                flow[v][u] -= path_flow
+                v = parent[v]
+            max_flow += path_flow
+        return max_flow
+            </pre>
+        </div>
+    </div>
+    
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
