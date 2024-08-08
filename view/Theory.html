@@ -1,154 +1,764 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centered Navbar Items</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .navbar-nav {
-            margin: auto;
-        }
-        <style>
-        body {
-            padding-top: 60px;
-        }
-        .content {
-            padding: 20px;
-        }
-        .figure {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .figure img {
-            max-width: 100%;
-            height: auto;
-        }
-        .table-of-contents {
-            margin-top: 20px;
-        }
-        .table-of-contents a {
-            display: block;
-            margin: 5px 0;
-        }
-    </style>
-    </style>
-</head>
-<body>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Flow Network Theory using Edmonds-Karp Algorithm</title>
     
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Need this to display equations properly in google chrome.  Google chrome dropped support for MathML -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=MML_HTMLorMML-full"></script>
+  </head>
+  <body>
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./About.html">About</a>
+                        <a class="nav-link active" aria-current="page" href="./../index.html">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="./Theory.html">Theory</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./About.html">About</a>
+                    </li>
+                   
                 </ul>
             </div>
         </nav>
     </div>
-    <div class="container">
-        <h1 class="text-center">Edmonds-Karp Algorithm</h1>
-    
-        <div class="table-of-contents">
-            <h2>Table of Contents</h2>
-            <a href="#introduction">1. Introduction</a>
-            <a href="#flow-network">2. Flow Network</a>
-            <a href="#residual-graph">3. Residual Graph</a>
-            <a href="#algorithm">4. Edmonds-Karp Algorithm</a>
-            <a href="#applications">5. Applications</a>
-            <a href="#pseudocode">6. Pseudo Code</a>
-        </div>
-    
-        <div id="introduction" class="content">
-            <h2>1. Introduction</h2>
-            <p>The Edmonds-Karp algorithm is an implementation of the Ford-Fulkerson method for computing the maximum flow in a flow network. It uses breadth-first search (BFS) to find augmenting paths. The algorithm runs in <code>O(VE<sup>2</sup>)</code> time, where <i>V</i> is the number of vertices and <i>E</i> is the number of edges in the graph.</p>
-        </div>
-    
-        <div id="flow-network" class="content">
-            <h2>2. Flow Network</h2>
-            <p>A flow network is a directed graph where each edge has a capacity and each edge receives a flow. The amount of flow on an edge cannot exceed the capacity of the edge. The goal is to maximize the total flow from a source vertex (S) to a sink vertex (T).</p>
-            <div class="figure">
-                <img src="flow_network_example.png" alt="Flow Network Example">
-                <figcaption>Figure 1: Flow Network Example</figcaption>
-            </div>
-        </div>
-    
-        <div id="residual-graph" class="content">
-            <h2>3. Residual Graph</h2>
-            <p>The residual graph is used to find augmenting paths in the flow network. For each edge in the original graph, the residual graph contains two edges: one in the same direction with a capacity equal to the remaining capacity of the original edge, and one in the opposite direction with a capacity equal to the flow on the original edge.</p>
-            <div class="figure">
-                <img src="residual_graph_example.png" alt="Residual Graph Example">
-                <figcaption>Figure 2: Residual Graph Example</figcaption>
-            </div>
-        </div>
-    
-        <div id="algorithm" class="content">
-            <h2>4. Edmonds-Karp Algorithm</h2>
-            <p>The Edmonds-Karp algorithm repeatedly finds augmenting paths using BFS and augments flow along these paths until no more augmenting paths can be found. Each BFS finds the shortest augmenting path in terms of the number of edges.</p>
-            <div class="figure">
-                <img src="edmonds_karp_algorithm.png" alt="Edmonds-Karp Algorithm">
-                <figcaption>Figure 3: Edmonds-Karp Algorithm</figcaption>
-            </div>
-        </div>
-    
-        <div id="applications" class="content">
-            <h2>5. Applications</h2>
-            <p>The Edmonds-Karp algorithm is used in various applications, including:</p>
-            <ul>
-                <li>Network flow optimization</li>
-                <li>Matching problems in bipartite graphs</li>
-                <li>Circulation problems</li>
-                <li>Connectivity in networks</li>
-            </ul>
-        </div>
-    
-        <div id="pseudocode" class="content">
-            <h2>6. Pseudo Code</h2>
-            <pre>
-    function BFS(source, sink, parent):
-        Create a queue, Q
-        Mark all nodes as not visited
-        Enqueue source and mark it as visited
-        while Q is not empty:
-            u = Q.dequeue()
-            for each edge (u, v) in residual graph:
-                if v is not visited and capacity of edge (u, v) > 0:
-                    Enqueue v and mark it as visited
-                    parent[v] = u
-                    if v == sink:
-                        return true
-        return false
-    
-    function edmondsKarp(source, sink):
-        Initialize flow in all edges to 0
-        while BFS(source, sink, parent) is true:
-            path_flow = Infinity
-            s = sink
-            while s != source:
-                path_flow = min(path_flow, capacity[parent[s]][s])
-                s = parent[s]
-            v = sink
-            while v != source:
-                u = parent[v]
-                flow[u][v] += path_flow
-                flow[v][u] -= path_flow
-                v = parent[v]
-            max_flow += path_flow
-        return max_flow
-            </pre>
-        </div>
-    </div>
-    
+     <br>
+     <div class="container">
+        <div class="top" >&nbsp;
+           <h1 align="center">The Edmonds-Karp Algorithm</h1>
+           <h2 align="center">Theory</h2>
+       </div>
+       <div class="content" id="theory">
+         <article>
+            <div class="algorithm-topics">
+               <h3 id="introduction">Introduction</h3>
+               <p>The Edmonds-Karp Algorithm is an implementation of the Ford-Fulkerson method.  
+                  Its purpose is to compute the maximum flow in a flow network.  The algorithm was
+                  published by Jack Edmonds and Richard Karp in 1972 in the paper entitled:</p>
+                  <a href="http://dx.doi.org/10.1145/321694.321699">
+                    <em>Edmonds, Jack; Karp, Richard M. (1972). "Theoretical improvements in algorithmic efficiency for network flow problems". Journal of the ACM. Association for Computing Machinery. 19 (2): 248–264. doi:10.1145/321694.321699.</em></a>
+                <p>The Edmonds-Karp Algorithm has a time complexity of: 
+                   <math xmlns="http://www.w3.org/1998/Math/MathML">
+                     <mstyle displaystyle="true">
+                       <mrow class="MJX-TeXAtom-ORD">
+                         <mi>O</mi>
+                         <mrow>
+                           <mo>(</mo>
+                           <msup>
+                             <mi>V</mi>
+                             <mrow class="MJX-TeXAtom-ORD">
+                               <mn>2</mn>
+                             </mrow>
+                           </msup>
+                           <mo>,</mo>
+                           <mi>E</mi>
+                           <mo>)</mo>
+                         </mrow>
+                       </mrow>
+                     </mstyle>
+                   </math>
+               </p>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+
+               <h3 id="flownetworks">Flow Network</h3>
+               <p>A <strong>Flow Network</strong> is a directed graph, where each edge has a maximum flow <strong>capacity</strong>. 
+                  Each edge can receive some amount of flow as long as that flow is less than or equal to that edge's capacity. 
+                  The vertices in a flow network are called <strong>nodes</strong>.  The edges are called <strong>links</strong> or <strong>arcs</strong>. 
+                  Every flow network contains a <strong>source</strong> and <strong>sink</strong> node.  A <strong>source</strong> node only contains outgoing 
+                  links to the network and can be thought of as having an infinite supply.  A <strong>sink</strong> node's flow output is only limited by the network.
+                  With the exception for source and sink nodes, the amount of flow entering a node must equal the amount of flow leaving the node. 
+               </p>
+               <div class="math">
+                  <math xmlns="http://www.w3.org/1998/Math/MathML">
+                     <mstyle displaystyle="true">
+                       <mrow class="MJX-TeXAtom-ORD">
+                         <mo>&#x2211;<!-- ∑ --></mo>
+                         <mrow class="MJX-TeXAtom-ORD">
+                           <mi>i</mi>
+                           <mi>n</mi>
+                           <mi>p</mi>
+                           <mi>u</mi>
+                           <mi>t</mi>
+                         </mrow>
+                         <mo>=</mo>
+                         <mo>&#x2211;<!-- ∑ --></mo>
+                         <mrow class="MJX-TeXAtom-ORD">
+                           <mi>o</mi>
+                           <mi>u</mi>
+                           <mi>t</mi>
+                           <mi>p</mi>
+                           <mi>u</mi>
+                           <mi>t</mi>
+                         </mrow>
+                       </mrow>
+                     </mstyle>
+                  </math>
+               </div>
+
+               <p><strong>The Flow Network Problem:</strong></p>
+               <p>We are given:
+                  <ul>
+                     <li>A directed graph with a set of edges and vertices </li>
+                     <li>A source vertex capable of providing infinite flow </li>
+                     <li>A target/sink vertex that we wish to measure the maximum flow output </li>
+                     <li>Every edge has a capacity limit</li>
+                  </ul>
+               </p>
+               <p><strong>Goal:</strong> We want to find the actual flow through the network so that we maximize the output at the sink node.
+                  Let S be the source node, T be the target/sink node, and v be some vertex.</p>
+               <div class="math">
+                  <p>Flow Value = 
+                     <math xmlns="http://www.w3.org/1998/Math/MathML">
+                       <mstyle displaystyle="true">
+                         <mrow class="MJX-TeXAtom-ORD">
+                           <munder>
+                             <mo movablelimits="false">&#x2211;<!-- ∑ --></mo>
+                             <mrow class="MJX-TeXAtom-ORD">
+                               <mi>a</mi>
+                               <mi>l</mi>
+                               <mi>l</mi>
+                               <mtext>&#xA0;</mtext>
+                               <mi>v</mi>
+                             </mrow>
+                           </munder>
+                           <mrow class="MJX-TeXAtom-ORD">
+                             <mi>f</mi>
+                             <mrow>
+                               <mo>(</mo>
+                               <mi>S</mi>
+                               <mo>,</mo>
+                               <mi>v</mi>
+                               <mo>)</mo>
+                             </mrow>
+                           </mrow>
+                           <mo>=</mo>
+                           <munder>
+                             <mo movablelimits="false">&#x2211;<!-- ∑ --></mo>
+                             <mrow class="MJX-TeXAtom-ORD">
+                               <mi>a</mi>
+                               <mi>l</mi>
+                               <mi>l</mi>
+                               <mtext>&#xA0;</mtext>
+                               <mi>v</mi>
+                             </mrow>
+                           </munder>
+                           <mrow class="MJX-TeXAtom-ORD">
+                             <mi>f</mi>
+                             <mrow>
+                               <mo>(</mo>
+                               <mi>v</mi>
+                               <mo>,</mo>
+                               <mi>T</mi>
+                               <mo>)</mo>
+                             </mrow>
+                           </mrow>
+                         </mrow>
+                       </mstyle>
+                     </math>
+                   </p> 
+               </div>
+
+               <p><strong>Our constraints</strong></p>
+               <p>The flow through an edge is limited by the edge's capacity constraint:</p>
+
+               <div class="math">
+                  <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                      <mrow class="MJX-TeXAtom-ORD">
+                        <mi>L</mi>
+                        <mi>e</mi>
+                        <mi>t</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mi>c</mi>
+                        <mrow>
+                          <mo>(</mo>
+                          <mi>x</mi>
+                          <mo>,</mo>
+                          <mi>y</mi>
+                          <mo>)</mo>
+                        </mrow>
+                        <mtext>&#xA0;</mtext>
+                        <mi>e</mi>
+                        <mi>q</mi>
+                        <mi>u</mi>
+                        <mi>a</mi>
+                        <mi>l</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mi>c</mi>
+                        <mi>a</mi>
+                        <mi>p</mi>
+                        <mi>a</mi>
+                        <mi>c</mi>
+                        <mi>i</mi>
+                        <mi>t</mi>
+                        <mi>y</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mi>o</mi>
+                        <mi>f</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mi>e</mi>
+                        <mi>d</mi>
+                        <mi>g</mi>
+                        <mi>e</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mrow class="MJX-TeXAtom-ORD">
+                          <mover>
+                            <mrow>
+                              <mi>x</mi>
+                              <mi>y</mi>
+                            </mrow>
+                            <mo stretchy="false">&#x2192;<!-- → --></mo>
+                          </mover>
+                        </mrow>
+                      </mrow>
+                    </mstyle>
+                  </math>
+               </div>
+               <br>
+ 
+               <div class="math">
+                  <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                      <mrow class="MJX-TeXAtom-ORD">
+                        <mi>L</mi>
+                        <mi>e</mi>
+                        <mi>t</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mi>f</mi>
+                        <mrow>
+                          <mo>(</mo>
+                          <mi>x</mi>
+                          <mo>,</mo>
+                          <mi>y</mi>
+                          <mo>)</mo>
+                        </mrow>
+                        <mtext>&#xA0;</mtext>
+                        <mi>e</mi>
+                        <mi>q</mi>
+                        <mi>u</mi>
+                        <mi>a</mi>
+                        <mi>l</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mi>a</mi>
+                        <mi>c</mi>
+                        <mi>t</mi>
+                        <mi>u</mi>
+                        <mi>a</mi>
+                        <mi>l</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mi>f</mi>
+                        <mi>l</mi>
+                        <mi>o</mi>
+                        <mi>w</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mi>i</mi>
+                        <mi>n</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mi>e</mi>
+                        <mi>d</mi>
+                        <mi>g</mi>
+                        <mi>e</mi>
+                        <mtext>&#xA0;</mtext>
+                        <mrow class="MJX-TeXAtom-ORD">
+                          <mover>
+                            <mrow>
+                              <mi>x</mi>
+                              <mi>y</mi>
+                            </mrow>
+                            <mo stretchy="false">&#x2192;<!-- → --></mo>
+                          </mover>
+                        </mrow>
+                      </mrow>
+                    </mstyle>
+                  </math>
+               </div>
+               <br>
+               <div class="math">
+                  <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                      <mrow class="MJX-TeXAtom-ORD">
+                        <mn>0</mn>
+                        <mo>&#x2264;<!-- ≤ --></mo>
+                        <mi>f</mi>
+                        <mrow>
+                          <mo>(</mo>
+                          <mi>x</mi>
+                          <mo>,</mo>
+                          <mi>y</mi>
+                          <mo>)</mo>
+                        </mrow>
+                        <mo>&#x2264;<!-- ≤ --></mo>
+                        <mi>c</mi>
+                        <mrow>
+                          <mo>(</mo>
+                          <mi>x</mi>
+                          <mo>,</mo>
+                          <mi>y</mi>
+                          <mo>)</mo>
+                        </mrow>
+                      </mrow>
+                    </mstyle>
+                  </math>
+               </div>
+            
+               <p>Flow conservation:</p>
+               <div class="math">
+                  <p> For all
+                      <math xmlns="http://www.w3.org/1998/Math/MathML">
+                         <mstyle displaystyle="true">
+                           <mrow class="MJX-TeXAtom-ORD">
+                             <mi>u</mi>
+                             <mo>&#x2260;<!-- ≠ --></mo>
+                             <mi>S</mi>
+                             <mo>,</mo>
+                             <mi>T</mi>
+                           </mrow>
+                         </mstyle>
+                       </math> 
+                       <math xmlns="http://www.w3.org/1998/Math/MathML">
+                         <mstyle displaystyle="true">
+                           <mrow class="MJX-TeXAtom-ORD">
+                             <munder>
+                               <mo movablelimits="false">&#x2211;<!-- ∑ --></mo>
+                               <mrow class="MJX-TeXAtom-ORD">
+                                 <mi>a</mi>
+                                 <mi>l</mi>
+                                 <mi>l</mi>
+                                 <mtext>&#xA0;</mtext>
+                                 <mi>v</mi>
+                               </mrow>
+                             </munder>
+                             <mrow class="MJX-TeXAtom-ORD">
+                               <mi>f</mi>
+                               <mrow>
+                                 <mo>(</mo>
+                                 <mi>v</mi>
+                                 <mo>,</mo>
+                                 <mi>u</mi>
+                                 <mo>)</mo>
+                               </mrow>
+                             </mrow>
+                             <mo>=</mo>
+                             <munder>
+                               <mo movablelimits="false">&#x2211;<!-- ∑ --></mo>
+                               <mrow class="MJX-TeXAtom-ORD">
+                                 <mi>a</mi>
+                                 <mi>l</mi>
+                                 <mi>l</mi>
+                                 <mtext>&#xA0;</mtext>
+                                 <mi>v</mi>
+                               </mrow>
+                             </munder>
+                             <mrow class="MJX-TeXAtom-ORD">
+                               <mi>f</mi>
+                               <mrow>
+                                 <mo>(</mo>
+                                 <mi>u</mi>
+                                 <mo>,</mo>
+                                 <mi>v</mi>
+                                 <mo>)</mo>
+                               </mrow>
+                             </mrow>
+                           </mrow>
+                         </mstyle>
+                       </math>
+                   </p>
+               </div>
+
+               <p><strong>Observations and Simplifications:</strong></p>
+               <p><em>Cycles:</em> If a cycle has flow on all edges, then we can get an equivalent solution with greater than or equal to
+                 one of the edges having zero flow.  Why send product (flow) in a cycle with positive flow?<br>
+                 Notice: Any edge
+                 <math xmlns="http://www.w3.org/1998/Math/MathML">
+                   <mstyle displaystyle="true">
+                     <mrow class="MJX-TeXAtom-ORD">
+                       <mrow class="MJX-TeXAtom-ORD">
+                         <mover>
+                           <mrow>
+                             <mi>v</mi>
+                             <mi>S</mi>
+                           </mrow>
+                           <mo stretchy="false">&#x2192;<!-- → --></mo>
+                         </mover>
+                       </mrow>
+                     </mrow>
+                   </mstyle>
+                 </math>
+                 must be part of a cycle.  Any solution has an equivalent with
+                 <math xmlns="http://www.w3.org/1998/Math/MathML">
+                   <mstyle displaystyle="true">
+                     <mrow class="MJX-TeXAtom-ORD">
+                       <mi>f</mi>
+                       <mrow>
+                         <mo>(</mo>
+                         <mi>v</mi>
+                         <mo>,</mo>
+                         <mi>S</mi>
+                         <mo>)</mo>
+                       </mrow>
+                       <mo>=</mo>
+                       <mn>0</mn>
+                     </mrow>
+                   </mstyle>
+                 </math> 
+               </p>
+
+               <p><em>Sinks:</em> Any vertex, other than our target sink node, which contains <strong>only</strong> incoming edges can be removed.
+                  In this circumstance flow would never make it to the target node.
+               </p>
+
+
+               <h3 id="applications">Applications</h3>
+               <p>Some applications where it is desirable to find the maximum flow through a network are:
+                  <ul>
+                     <li>Modeling traffic in a road system</li>
+                     <li>Fluids in pipes</li>
+                     <li>Currents flowing through an electical circuit</li>
+                  </ul>
+                  The following paper describes some applications of the maximum flow network problem:
+                  <a href="http://theory.stanford.edu/~tim/w16/l/l4.pdf">link</a>
+               </p>
+
+
+               <h3 id="residualgraph">Residual Graph</h3>
+               <p>The residual graph is a tool used in the maximum flow calculations that helps us determine how much you can change in the original graph.</p>
+               <p><strong>Definition:</strong> Given a network 
+                  <math xmlns="http://www.w3.org/1998/Math/MathML">
+                      <mstyle displaystyle="true">
+                        <mrow class="MJX-TeXAtom-ORD">
+                          <mi>G</mi>
+                          <mo>=</mo>
+                          <mrow>
+                            <mo>(</mo>
+                            <mi>V</mi>
+                            <mo>,</mo>
+                            <mi>E</mi>
+                            <mo>)</mo>
+                          </mrow>
+                        </mrow>
+                      </mstyle>
+                    </math>
+                    and a flow f, the <em>residual graph</em 
+                    <math xmlns="http://www.w3.org/1998/Math/MathML">
+                      <mstyle displaystyle="true">
+                        <mrow class="MJX-TeXAtom-ORD">
+                          <mi>r</mi>
+                          <mi>G</mi>
+                          <mo>=</mo>
+                          <mrow>
+                            <mo>(</mo>
+                            <msup>
+                              <mi>V</mi>
+                              <mo>&#x2032;</mo>
+                            </msup>
+                            <mo>,</mo>
+                            <msup>
+                              <mi>E</mi>
+                              <mo>&#x2032;</mo>
+                            </msup>
+                            <mo>)</mo>
+                          </mrow>
+                        </mrow>
+                      </mstyle>
+                    </math>
+                    of graph G with respect to the flow f is:
+                    <ul>
+                        <li> V' = V </li>
+                        <li> <strong>Forward Edges:</strong> For each edge
+                             <math xmlns="http://www.w3.org/1998/Math/MathML">
+                               <mstyle displaystyle="true">
+                                 <mrow class="MJX-TeXAtom-ORD">
+                                   <mi>e</mi>
+                                   <mo>&#x2208;<!-- ∈ --></mo>
+                                   <mi>E</mi>
+                                 </mrow>
+                               </mstyle>
+                             </math>
+                             with
+                             <math xmlns="http://www.w3.org/1998/Math/MathML">
+                               <mstyle displaystyle="true">
+                                 <mrow class="MJX-TeXAtom-ORD">
+                                   <mi>f</mi>
+                                   <mrow>
+                                     <mo>(</mo>
+                                     <mi>e</mi>
+                                     <mo>)</mo>
+                                   </mrow>
+                                   <mo>&#x003C;<!-- < --></mo>
+                                   <mi>c</mi>
+                                   <mrow>
+                                     <mo>(</mo>
+                                     <mi>e</mi>
+                                     <mo>)</mo>
+                                   </mrow>
+                                 </mrow>
+                               </mstyle>
+                             </math>
+                             , 
+                             <math xmlns="http://www.w3.org/1998/Math/MathML">
+                               <mstyle displaystyle="true">
+                                 <mrow class="MJX-TeXAtom-ORD">
+                                   <mi>e</mi>
+                                   <mo>&#x2208;<!-- ∈ --></mo>
+                                   <msup>
+                                     <mi>E</mi>
+                                     <mo>&#x2032;</mo>
+                                   </msup>
+                                 </mrow>
+                               </mstyle>
+                             </math>
+                             with capacity 
+                             <math xmlns="http://www.w3.org/1998/Math/MathML">
+                               <mstyle displaystyle="true">
+                                 <mrow class="MJX-TeXAtom-ORD">
+                                   <mi>c</mi>
+                                   <mrow>
+                                     <mo>(</mo>
+                                     <mi>e</mi>
+                                     <mo>)</mo>
+                                   </mrow>
+                                   <mo>&#x2212;<!-- − --></mo>
+                                   <mi>f</mi>
+                                   <mrow>
+                                     <mo>(</mo>
+                                     <mi>e</mi>
+                                     <mo>)</mo>
+                                   </mrow>
+                                 </mrow>
+                               </mstyle>
+                             </math>
+                             .
+                         </li> 
+                         <li>
+                              <strong>Backward Edges:</strong> For each edge
+                              <math xmlns="http://www.w3.org/1998/Math/MathML">
+                                <mstyle displaystyle="true">
+                                  <mrow class="MJX-TeXAtom-ORD">
+                                    <mi>e</mi>
+                                    <mo>=</mo>
+                                    <mrow>
+                                      <mo>(</mo>
+                                      <mi>u</mi>
+                                      <mo>,</mo>
+                                      <mi>v</mi>
+                                      <mo>)</mo>
+                                    </mrow>
+                                    <mo>&#x2208;<!-- ∈ --></mo>
+                                    <mi>E</mi>
+                                  </mrow>
+                                </mstyle>
+                              </math>
+                              with 
+                              <math xmlns="http://www.w3.org/1998/Math/MathML">
+                                <mstyle displaystyle="true">
+                                  <mrow class="MJX-TeXAtom-ORD">
+                                    <mi>f</mi>
+                                    <mrow>
+                                      <mo>(</mo>
+                                      <mi>e</mi>
+                                      <mo>)</mo>
+                                    </mrow>
+                                    <mo>&#x003E;<!-- > --></mo>
+                                    <mn>0</mn>
+                                  </mrow>
+                                </mstyle>
+                              </math>
+                              ,
+                              <math xmlns="http://www.w3.org/1998/Math/MathML">
+                                <mstyle displaystyle="true">
+                                  <mrow class="MJX-TeXAtom-ORD">
+                                    <mrow>
+                                      <mo>(</mo>
+                                      <mi>v</mi>
+                                      <mo>,</mo>
+                                      <mi>u</mi>
+                                      <mo>)</mo>
+                                    </mrow>
+                                    <mo>&#x2208;<!-- ∈ --></mo>
+                                    <msup>
+                                      <mi>E</mi>
+                                      <mo>&#x2032;</mo>
+                                    </msup>
+                                  </mrow>
+                                </mstyle>
+                              </math>
+                              with capacity
+                              <math xmlns="http://www.w3.org/1998/Math/MathML">
+                                <mstyle displaystyle="true">
+                                  <mrow class="MJX-TeXAtom-ORD">
+                                    <mi>f</mi>
+                                    <mrow>
+                                      <mo>(</mo>
+                                      <mi>e</mi>
+                                      <mo>)</mo>
+                                    </mrow>
+                                  </mrow>
+                                </mstyle>
+                              </math>
+                              .
+                         </li>
+                    </ul> 
+                  The following diagram represents the graph at a specific iteration of the maximum flow calcuations. 
+                  Each edge is annotated with the flow/capacity values.</p>
+
+                  <img src="./../static/Screenshot from 2024-08-08 01-12-46.png" alt="" srcset="">
+
+               
+
+               <p>The residual graph is constructed by creating a new graph with identical edges to the original graph.  The weights on the edges in 
+                  this graph represent the residual capacity available on each edge at the current instance of time during the maximum flow calculations.
+                  The residual flow is simply the edge capacity minus the edge flow.  Edges with an edge capcity equal to 0 can be elimnated from the graph.
+                </p>
+
+                <img src="./../static/s1.png" alt="" srcset="">
+               <p> We then create a new graph containing all the original edges but with their directions reversed.  Each of these edges contain weights equal to 
+                   the current flow rates.  Any edges that have a weight of zero can be removed.
+                   </p>
+                   <img src="./../static/s2.png" alt="" srcset="">
+               <p>These two graphs are then merged together to produce the <strong>Residual Graph</strong></p>
+
+               <h3 id="augmentingpath">Augmenting Paths</h3>
+               <p> An Augmenting path is any path from the source to the sink that can currently take more flow. The method for finding an augmenting path is the key
+                   feature of the Edmonds-Karp Algorithm.  The Edmonds-Karp algorithm uses a Breadth First Search (BFS) to find the augmenting path. 
+                   Over the course of the algorithm, flow is monotonically increased. There are instances where a path from the source to the sink can take on more
+                   flow, and that is an augmenting path.
+               </p>
+               <p>The Residual Network contains all potential flow changes.  Every edge in the network is represented in the Residual Network at lease once.
+                  Any directed path from source to sink in the Residual Network means we improve the solution.  Once we find an augmenting path, we find the
+                  smallest weight on that path and use that value to increase the flow.  This value is added to edges in the Flow Network if the edge in the
+                  Residual Graph is a forward edge.  This value is subtracted from edges in the Flow Network if the edge is the Residual Graph is a backward edge.
+                  We then regenerate the Residual Graph and repeat until we no longer find an augmenting path. 
+               </p>
+
+              
+
+
+               <h3 id="edmondskarp">The Edmonds-Karp Algorithm</h3>
+               <p>The Edmonds-Karp Algorithm is a specific implementation of the <a href="https://en.wikipedia.org/wiki/Ford–Fulkerson_algorithm">Ford-Fulkerson 
+                  method</a>.  In particular, Edmonds-Karp algorithm implements the searching for an augmenting path using the 
+                  Breadth First Search (BFS) algorithm. Other implementations of the Ford-Fulkerson method use the Depth First Search (DFS) algorithm to find
+                  augmenting paths.</p>
+
+               <h3 id="pseudocode">Algorithm Pseudocode</h3>
+               <pre>
+               <strong>inputs</strong>
+                  capacityMatrix[n x n] : Capacity Matrix
+                  adjMatrix[n x n]      : Adjacency Matrix
+                  src                   : Source
+                  target                : sink or target
+               <strong>output</strong> 
+                  maxFlow               : Maximum Flow Rate
+
+               <strong>The Edmonds-Karp:</strong>
+                  maxFlow = 0             // Initialize the flow to 0
+                  residualMatrix[n x n]   // The residual capacity array
+  
+                  while true:
+                    min, augmentPath = BFS(capacityMatrix, adjMatrix, source, target, residualMatrix)
+      
+                    if m = 0:
+                      break
+                   
+                    maxFlow = maxFlow + min
+                   
+                    // Walk the augmenting path 
+                    v = target
+                    while v != src:
+                      u = P[v] 
+                      residualMatrix[u,v] = residualMatrix[u,v] - min // Reduce the residual capacity            
+                      residualMatrix[v,u] = residualMatrix[v,u] + min // Increase the residual capacity of reverse edges 
+                      v = u
+
+                  return maxFlow 
+               </pre>
+
+               <p> This algorithm code starts with the maximum flow initially set to 0. 
+                   The while loop executes until there are no more augmenting paths.
+                   Within the while loop, we call BFS to find the shortest path from source to sink and the minimum residual capacity along that path, min.
+                   We then walk the augmenting path from target to source.  Using the minium residual capacity, we reduce all residual capacities on the 
+                   augmenting path by min and increase the residual capacities on the reverse edges (representing the flow). 
+
+               <h3 id="complexity">Complexity Analysis</h3>
+               <p>The Edmonds-Karp algorithm runs in 
+                  <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                      <mrow class="MJX-TeXAtom-ORD">
+                        <mi>O</mi>
+                        <mrow>
+                          <mo>(</mo>
+                          <mi>V</mi>
+                          <msup>
+                            <mi>E</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                              <mn>2</mn>
+                            </mrow>
+                          </msup>
+                          <mo>)</mo>
+                        </mrow>
+                      </mrow>
+                    </mstyle>
+                  </math>
+               </p>
+               <p>In each iteration of the algorithm, the shortest path (BFS) between the source and all other vertices must increase monotonically.  
+                  We need to prove that one iteration of the Edmonds-Karp algorithm is bounded by
+                  <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                      <mrow class="MJX-TeXAtom-ORD">
+                        <mi>O</mi>
+                        <mrow>
+                          <mo>(</mo>
+                          <mi>E</mi>
+                          <mo>)</mo>
+                        </mrow>
+                      </mrow>
+                    </mstyle>
+                  </math>
+                 .  We then need to prove that the number of iterations of the algorithm to find the maximum flow of a network is bounded by
+                  <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                      <mrow class="MJX-TeXAtom-ORD">
+                        <mi>O</mi>
+                        <mrow>
+                          <mo>(</mo>
+                          <mi>VE</mi>
+                          <mo>)</mo>
+                        </mrow>
+                      </mrow>
+                    </mstyle>
+                  </math>
+
+                 iterations.  Proving these two parts implies that the Edmonds-Karp algorithm is bounded by 
+                  <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                      <mrow class="MJX-TeXAtom-ORD">
+                        <mi>O</mi>
+                        <mrow>
+                          <mo>(</mo>
+                          <mi>V</mi>
+                          <msup>
+                            <mi>E</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                              <mn>2</mn>
+                            </mrow>
+                          </msup>
+                          <mo>)</mo>
+                        </mrow>
+                      </mrow>
+                    </mstyle>
+                  </math>
+                .
+              </p>
+              
+                  
+        </article>
+    
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="js/toc.js"> </script>
+     </div>
+  </body>
 </html>
