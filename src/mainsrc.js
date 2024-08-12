@@ -118,6 +118,10 @@ function setCapacity() {
 }
 
 function startAlgorithm() {
+    if(capacities.length==0){
+        alert("Canvas is empty. Please add nodes and edges!");
+        return;
+    }
     if (source === -1 || sink === -1) {
         alert("Please set both a source and a sink.");
         return;
@@ -222,7 +226,7 @@ function toggleEditorView() {
 
 function showIterationsGraphically() {
     if (iterationSteps.length === 0) {
-        console.log("No iterations to display. Please run the algorithm first.");
+        alert("No iterations to display. Please run the algorithm first.");
         return;
     }
     toggleStepView();

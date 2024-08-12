@@ -22,7 +22,8 @@ function drawBoundary() {
 
 function showSteps() {
     if (iterationSteps.length === 0) {
-        console.log("No steps recorded. Please run the algorithm first.");
+        // console.log("No steps recorded. Please run the algorithm first.");
+        alert("No steps recorded. Please run the algorithm first.");
         return;
     }
     stepIndex = 0;
